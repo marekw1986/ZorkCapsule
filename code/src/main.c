@@ -21,6 +21,11 @@ int main(void)
 	system_time_init();
 	
 	udc_start();
+    
+    open_story();
+    configure(V1, V8);
+    initialize_screen();
+    z_restart();
 
     while (1)
     {
