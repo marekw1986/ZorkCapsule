@@ -7,10 +7,20 @@ ASF = /opt/microchip/xdk-asf-3.50.0
 INCLUDES = \
 	-Iinclude \
 	-Izork \
+	-I$(ASF)/sam0/utils \
+	-I$(ASF)/sam0/utils/preprocessor \
 	-I$(ASF)/sam0/utils/header_files \
 	-I$(ASF)/sam0/utils/cmsis/samd21/include \
 	-I$(ASF)/thirdparty/CMSIS/Include \
 	-I$(ASF)/common/utils \
+	-I$(ASF)/sam0/drivers/system \
+	-I$(ASF)/sam0/drivers/system/clock \
+	-I$(ASF)/sam0/drivers/system/clock/clock_samd21_r21_da_ha1 \
+	-I$(ASF)/sam0/drivers/system/interrupt \
+	-I$(ASF)/sam0/drivers/system/interrupt/system_interrupt_samd21 \
+	-I$(ASF)/sam0/drivers/system/pinmux \
+	-I$(ASF)/sam0/drivers/system/power/power_sam_d_r_h \
+	-I$(ASF)/sam0/drivers/system/reset/reset_sam_d_r_h \
 	-I$(ASF)/sam0/utils/cmsis/samd21/source \
 
 CFLAGS = \
@@ -56,8 +66,14 @@ CSRCS = \
 	zork/screen.c \
 	zork/text.c \
 	zork/variable.c \
+	$(ASF)/sam0/drivers/system/clock/clock_samd21_r21_da_ha1/clock.c \
+	$(ASF)/sam0/drivers/system/clock/clock_samd21_r21_da_ha1/gclk.c \
+	$(ASF)/sam0/drivers/system/system.c \
+	$(ASF)/sam0/drivers/system/interrupt/system_interrupt.c \
+	$(ASF)/sam0/drivers/system/pinmux/pinmux.c \
 	$(ASF)/sam0/utils/cmsis/samd21/source/system_samd21.c \
 	$(ASF)/sam0/utils/cmsis/samd21/source/gcc/startup_samd21.c \
+	$(ASF)/common/utils/interrupt/interrupt_sam_nvic.c
 	
 ASRCS = \
 
