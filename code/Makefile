@@ -7,21 +7,21 @@ ASF = /opt/microchip/xdk-asf-3.50.0
 INCLUDES = \
 	-Iinclude \
 	-Izork \
-	-I$(ASF)/sam0/utils \
-	-I$(ASF)/sam0/utils/preprocessor \
-	-I$(ASF)/sam0/utils/header_files \
-	-I$(ASF)/sam0/utils/cmsis/samd21/include \
-	-I$(ASF)/thirdparty/CMSIS/Include \
-	-I$(ASF)/common/utils \
-	-I$(ASF)/sam0/drivers/system \
-	-I$(ASF)/sam0/drivers/system/clock \
-	-I$(ASF)/sam0/drivers/system/clock/clock_samd21_r21_da_ha1 \
-	-I$(ASF)/sam0/drivers/system/interrupt \
-	-I$(ASF)/sam0/drivers/system/interrupt/system_interrupt_samd21 \
-	-I$(ASF)/sam0/drivers/system/pinmux \
-	-I$(ASF)/sam0/drivers/system/power/power_sam_d_r_h \
-	-I$(ASF)/sam0/drivers/system/reset/reset_sam_d_r_h \
-	-I$(ASF)/sam0/utils/cmsis/samd21/source \
+	-isystem $(ASF)/sam0/utils \
+	-isystem $(ASF)/sam0/utils/preprocessor \
+	-isystem $(ASF)/sam0/utils/header_files \
+	-isystem $(ASF)/sam0/utils/cmsis/samd21/include \
+	-isystem $(ASF)/thirdparty/CMSIS/Include \
+	-isystem $(ASF)/common/utils \
+	-isystem $(ASF)/sam0/drivers/system \
+	-isystem $(ASF)/sam0/drivers/system/clock \
+	-isystem $(ASF)/sam0/drivers/system/clock/clock_samd21_r21_da_ha1 \
+	-isystem $(ASF)/sam0/drivers/system/interrupt \
+	-isystem $(ASF)/sam0/drivers/system/interrupt/system_interrupt_samd21 \
+	-isystem $(ASF)/sam0/drivers/system/pinmux \
+	-isystem $(ASF)/sam0/drivers/system/power/power_sam_d_r_h \
+	-isystem $(ASF)/sam0/drivers/system/reset/reset_sam_d_r_h \
+	-isystem $(ASF)/sam0/utils/cmsis/samd21/source \
 
 CFLAGS = \
     -mcpu=cortex-m0plus \
