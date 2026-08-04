@@ -30,6 +30,13 @@ int main(void)
     while (1)
     {
         zork_handle();
+        
+        if (udi_cdc_is_rx_ready()) {
+            char c = udi_cdc_getc();
+            if (udi_cdc_is_tx_ready()) {
+                udi_cdc_putc(c);
+            }
+        }
     }
 
     return 0;
