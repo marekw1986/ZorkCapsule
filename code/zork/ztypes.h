@@ -46,8 +46,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include "system_time.h"
 
-static inline uint32_t millis(void) { return 0; }
 
 /* Configuration options */
 
