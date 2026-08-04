@@ -20,7 +20,7 @@ int main(void)
 	system_init();   /* configures XOSC, DFLL, GCLKs per conf_clocks.h */
 	system_time_init();
 	
-	//udc_start();
+	udc_start();
 
     while (1)
     {

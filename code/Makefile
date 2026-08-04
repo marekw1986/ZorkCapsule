@@ -93,6 +93,7 @@ CSRCS = \
 	$(ASF)/sam0/drivers/usb/stack_interface/usb_device_udd.c \
 	$(ASF)/common/services/usb/udc/udc.c \
 	$(ASF)/common/services/usb/class/cdc/device/udi_cdc.c \
+	$(ASF)/common/services/usb/class/cdc/device/udi_cdc_desc.c
 	
 ASRCS = \
 
