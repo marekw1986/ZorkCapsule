@@ -12,7 +12,15 @@ INCLUDES = \
 	-isystem $(ASF)/sam0/utils/header_files \
 	-isystem $(ASF)/sam0/utils/cmsis/samd21/include \
 	-isystem $(ASF)/thirdparty/CMSIS/Include \
+	-isystem $(ASF)/common/boards \
 	-isystem $(ASF)/common/utils \
+	-isystem $(ASF)/common/services/sleepmgr \
+	-isystem $(ASF)/common/services/usb \
+	-isystem $(ASF)/common/services/usb/udc \
+	-isystem $(ASF)/common/services/usb/class/cdc \
+	-isystem $(ASF)/common/services/usb/class/cdc/device \
+	-isystem $(ASF)/sam0/drivers/extint \
+	-isystem $(ASF)/sam0/drivers/port \
 	-isystem $(ASF)/sam0/drivers/system \
 	-isystem $(ASF)/sam0/drivers/system/clock \
 	-isystem $(ASF)/sam0/drivers/system/clock/clock_samd21_r21_da_ha1 \
@@ -21,6 +29,9 @@ INCLUDES = \
 	-isystem $(ASF)/sam0/drivers/system/pinmux \
 	-isystem $(ASF)/sam0/drivers/system/power/power_sam_d_r_h \
 	-isystem $(ASF)/sam0/drivers/system/reset/reset_sam_d_r_h \
+	-isystem $(ASF)/sam0/drivers/usb \
+	-isystem $(ASF)/sam0/drivers/usb/usb_sam_d_r \
+	-isystem $(ASF)/sam0/drivers/usb/stack_interface \
 	-isystem $(ASF)/sam0/utils/cmsis/samd21/source \
 
 CFLAGS = \
@@ -67,6 +78,9 @@ CSRCS = \
 	zork/screen.c \
 	zork/text.c \
 	zork/variable.c \
+	$(ASF)/common/services/sleepmgr/samd/sleepmgr.c \
+	$(ASF)/sam0/drivers/extint/extint_sam_d_r_h/extint.c \
+	$(ASF)/sam0/drivers/port/port.c \
 	$(ASF)/sam0/drivers/system/clock/clock_samd21_r21_da_ha1/clock.c \
 	$(ASF)/sam0/drivers/system/clock/clock_samd21_r21_da_ha1/gclk.c \
 	$(ASF)/sam0/drivers/system/system.c \
@@ -74,7 +88,11 @@ CSRCS = \
 	$(ASF)/sam0/drivers/system/pinmux/pinmux.c \
 	$(ASF)/sam0/utils/cmsis/samd21/source/system_samd21.c \
 	$(ASF)/sam0/utils/cmsis/samd21/source/gcc/startup_samd21.c \
-	$(ASF)/common/utils/interrupt/interrupt_sam_nvic.c
+	$(ASF)/common/utils/interrupt/interrupt_sam_nvic.c \
+	$(ASF)/sam0/drivers/usb/usb_sam_d_r/usb.c \
+	$(ASF)/sam0/drivers/usb/stack_interface/usb_device_udd.c \
+	$(ASF)/common/services/usb/udc/udc.c \
+	$(ASF)/common/services/usb/class/cdc/device/udi_cdc.c \
 	
 ASRCS = \
 
