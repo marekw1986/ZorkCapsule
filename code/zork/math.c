@@ -255,13 +255,14 @@ void z_je( int count, zword_t * operand )
 {
     int i;
 
-    for ( i = 1; i < count; i++ )
+    for ( i = 1; i < count; i++ ) {
         if ( operand[0] == operand[i] )
         {
             conditional_jump( TRUE );
             return;
         }
-        conditional_jump( FALSE );
+    }
+	conditional_jump( FALSE );
 }
 
 /*
