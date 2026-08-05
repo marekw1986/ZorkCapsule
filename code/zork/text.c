@@ -550,7 +550,7 @@ void write_char( int c )
              if(line_count >= 80)
              {
                  line_count = 1;
-                 const uint8_t newlinechr = '\n';
+                 //const uint8_t newlinechr = '\n';
                  //HAL_UART_Transmit(&huart2, &newlinechr, 1, HAL_MAX_DELAY);
                  //vga_putc(newlinechr);
              }
