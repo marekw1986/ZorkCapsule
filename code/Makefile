@@ -2,6 +2,11 @@ CC      = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
 SIZE    = arm-none-eabi-size
 
+OPENOCD = openocd
+OPENOCD_INTERFACE = interface/stlink.cfg
+OPENOCD_TRANSPORT = hla_swd
+OPENOCD_TARGET = target/at91samdXX.cfg
+
 ASF = /opt/microchip/xdk-asf-3.50.0
 
 INCLUDES = \
@@ -119,6 +124,14 @@ $(TARGET).bin: $(TARGET).elf
 
 $(TARGET).hex: $(TARGET).elf
 	$(OBJCOPY) -O ihex $< $@
+	
+flash: $(TARGET).elf
+	$(OPENOCD) \
+		-f $(OPENOCD_INTERFACE) \
+		-c "transport select $(OPENOCD_TRANSPORT)" \
+		-f $(OPENOCD_TARGET) \
+		-c "adapter speed 1000" \
+		-c "program $< verify reset exit"
 
 clean:
 	rm -rf $(BUILD)
