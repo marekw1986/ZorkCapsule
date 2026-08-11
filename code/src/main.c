@@ -32,7 +32,7 @@ int main(void)
 	
 	udc_start();
     
-    //open_story();
+    open_story();
     configure(V1, V8);
     initialize_screen();
     z_restart();

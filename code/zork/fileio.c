@@ -46,7 +46,7 @@
 #include "zork1_dat.h"
 #include "string.h"
 
-#define MAX_DYNAMIC_MEMORY	5*1024
+#define MAX_DYNAMIC_MEMORY	12*1024
 
 /* Static data */
 
@@ -63,38 +63,6 @@ static uint16_t flash_get_word(uint32_t addr);
  * Open game file for read.
  *
  */
-
-//void verify(void)
-//{
-//    FRESULT res;
-//    UINT br;
-//    const char game_name[]   = "GAME.DAT";
-//
-//    res = f_open(&game, game_name, FA_READ);
-//    if (res != FR_OK) {
-//    	printf("Can't open GAME.DAT for verification");
-//    }
-//
-//    uint8_t failed = 0x00;
-//    uint32_t flash_ptr = 0;
-//    f_lseek(&game, 0);  // start at beginning
-//    uint8_t dat;
-//    for (flash_ptr = 0; flash_ptr < zork1_dat_len; flash_ptr++) {
-//    	f_read(&game, &dat, 1, &br);
-//    	if (dat != zork1_dat[flash_ptr]) {
-//    		printf("Mismatch detected at flash_ptr %lu, flash: %d, sd: %d\n", flash_ptr, zork1_dat[flash_ptr], dat);
-//    		failed |= 0x01;
-////    		break;
-//    	}
-//    }
-//
-//    printf("Failed: %d\n", failed);
-//
-//    f_read(&game, dynamic_memory, dynamic_size, &br);
-//    f_close(&game);  // start at beginning
-//
-//    return;
-//}
 
 void open_story(void)
 {
