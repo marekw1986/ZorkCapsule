@@ -41,14 +41,14 @@ int main(void)
     {
         zork_handle();
         
-        
+        /*
         if (udi_cdc_is_rx_ready()) {
             char c = udi_cdc_getc();
             if (udi_cdc_is_tx_ready()) {
                 udi_cdc_putc(c);
             }
         }
-        
+        */
 
         if ((uint32_t)(millis() - blink_timer) > 1000) {
             blink_timer = millis();

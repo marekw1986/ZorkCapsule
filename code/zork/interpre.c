@@ -40,6 +40,7 @@
   */
 
 #include <ctype.h>
+#include <udi_cdc.h>
 #include "ztypes.h"
 
 vm_state_t state;
@@ -968,6 +969,11 @@ void zork_handle(void) {
                 state = VM_RUNNING;
             }
             */
+            if (udi_cdc_is_rx_ready()) {
+                char c = udi_cdc_getc();
+                store_operand((zword_t)c);
+                state = VM_RUNNING;
+            }
             break;
         }
 
@@ -975,7 +981,7 @@ void zork_handle(void) {
         {
             uint8_t c;
             //if (ps2_kbd_getkey(&c) == 1) {
-            if (0) {        // TEMP to compile!
+            if (udi_cdc_is_rx_ready() && (c = udi_cdc_getc())) {
                 if (c == '\r' || c == '\n') {
                     // Line complete — finalise buffer in Z-machine memory
                     if (h_type > V4) {
@@ -997,6 +1003,9 @@ void zork_handle(void) {
                         store_operand((zword_t)'\r');
 
                     //vga_putc('\n');
+                    if (udi_cdc_is_tx_ready()) {
+                        udi_cdc_putc('\n');
+                    }
                     state = VM_RUNNING;
 
                 } else if (c == '\b' || c == 127) {
@@ -1010,6 +1019,9 @@ void zork_handle(void) {
                         set_byte(addr, ' ');
                         // Visual erase
                         //vga_putc('\b');  // you'll need to implement \b in vga_putc
+                        if (udi_cdc_is_tx_ready()) {
+                            udi_cdc_putc('\b');
+                        }
                     }
                 } else if (c >= 32 && c <= 126 && line_input.read_size < line_input.buflen) {
                     // Normal character — write into Z-machine memory directly
@@ -1019,6 +1031,9 @@ void zork_handle(void) {
                     set_byte(addr, tolower(c));
                     line_input.read_size++;
                     //vga_putc(c);  // echo to screen
+                    if (udi_cdc_is_tx_ready()) {
+                        udi_cdc_putc(c);
+                    }
                 }
             }
             break;

@@ -41,6 +41,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <udi_cdc.h>
 #include "ztypes.h"
 
 
@@ -542,22 +543,28 @@ void write_char( int c )
     
     if ( screen_window == TEXT_WINDOW )
     {
-         if(c == '\n')
-             line_count = 0;
-         else
-         {
-             line_count++;
-             if(line_count >= 80)
-             {
-                 line_count = 1;
-                 //const uint8_t newlinechr = '\n';
-                 //HAL_UART_Transmit(&huart2, &newlinechr, 1, HAL_MAX_DELAY);
-                 //vga_putc(newlinechr);
-             }
-         }
+        if(c == '\n')
+            line_count = 0;
+        else
+        {
+            line_count++;
+            if(line_count >= 80)
+            {
+                line_count = 1;
+                //const uint8_t newlinechr = '\n';
+                //HAL_UART_Transmit(&huart2, &newlinechr, 1, HAL_MAX_DELAY);
+                //vga_putc(newlinechr);
+                if (udi_cdc_is_tx_ready()) {
+                    udi_cdc_putc('\n');
+                }
+            }
+        }
          
-         //HAL_UART_Transmit(&huart2, (uint8_t*)&c, 1, HAL_MAX_DELAY);
-         //vga_putc(c);
+        //HAL_UART_Transmit(&huart2, (uint8_t*)&c, 1, HAL_MAX_DELAY);
+        //vga_putc(c);
+        if (udi_cdc_is_tx_ready()) {
+            udi_cdc_putc(c);
+        }
     }
 }                               /* write_char */
 
