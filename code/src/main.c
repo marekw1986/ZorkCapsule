@@ -15,9 +15,19 @@
 #include "conf_usb.h"
 #include "main.h"
 
+#define LED_PIN   17   // PA17 = D13
+#define LED_GROUP 0    // Port group A
+
+uint32_t blink_timer;
+
 int main(void)
 {
 	system_init();   /* configures XOSC, DFLL, GCLKs per conf_clocks.h */
+
+	/* Configure PA17 (D13) as output, drive high to sanity-check GPIO */
+	PORT->Group[LED_GROUP].DIRSET.reg = (1 << LED_PIN);
+	PORT->Group[LED_GROUP].OUTSET.reg = (1 << LED_PIN);	
+
 	system_time_init();
 	
 	udc_start();
@@ -37,6 +47,12 @@ int main(void)
                 udi_cdc_putc(c);
             }
         }
+
+        if ((uint32_t)(millis() - blink_timer) > 200) {
+            blink_timer = millis();
+            PORT->Group[LED_GROUP].OUTTGL.reg = (1 << LED_PIN);
+        }  
+        
     }
 
     return 0;
