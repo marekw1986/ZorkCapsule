@@ -32,7 +32,7 @@ int main(void)
 	
 	udc_start();
     
-    open_story();
+    //open_story();
     configure(V1, V8);
     initialize_screen();
     z_restart();
@@ -41,14 +41,16 @@ int main(void)
     {
         zork_handle();
         
+        
         if (udi_cdc_is_rx_ready()) {
             char c = udi_cdc_getc();
             if (udi_cdc_is_tx_ready()) {
                 udi_cdc_putc(c);
             }
         }
+        
 
-        if ((uint32_t)(millis() - blink_timer) > 200) {
+        if ((uint32_t)(millis() - blink_timer) > 1000) {
             blink_timer = millis();
             PORT->Group[LED_GROUP].OUTTGL.reg = (1 << LED_PIN);
         }  
@@ -100,4 +102,12 @@ void main_cdc_set_dtr(uint8_t port, bool b_enable)
 		b_com_port_opened = false;
 	}
 	*/
+}
+
+void HardFault_Handler(void)
+{
+    while (1) {
+        PORT->Group[LED_GROUP].OUTTGL.reg = (1 << LED_PIN);
+        for (volatile uint32_t i = 0; i < 200000; i++);  // fast blink = fault
+    }
 }
