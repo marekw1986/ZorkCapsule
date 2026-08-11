@@ -129,6 +129,7 @@ flash: $(TARGET).elf
 	$(OPENOCD) \
 		-f $(OPENOCD_INTERFACE) \
 		-c "transport select $(OPENOCD_TRANSPORT)" \
+		-c "set CPUTAPID 0x0bc11477" \
 		-f $(OPENOCD_TARGET) \
 		-c "adapter speed 1000" \
 		-c "program $< verify reset exit"
