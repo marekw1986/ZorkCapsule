@@ -138,15 +138,15 @@ void cdc_rx_notify(uint8_t port)
 
 void main_cdc_set_dtr(uint8_t port, bool b_enable)
 {
-	/*
 	if (b_enable) {
-		ui_com_open(port);
-		b_com_port_opened = true;
+		//ui_com_open(port);
+		//b_com_port_opened = true;
+        printf("USB DTR on\r\n");
 	}else{
-		ui_com_close(port);
-		b_com_port_opened = false;
+		//ui_com_close(port);
+		//b_com_port_opened = false;
+        printf("USB DTR off\r\n");
 	}
-	*/
 }
 
 void HardFault_Handler(void)
