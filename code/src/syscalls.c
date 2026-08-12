@@ -38,6 +38,7 @@
 #include <stdarg.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <usart.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +47,8 @@ extern "C" {
 #undef errno
 extern int errno;
 extern int _end;
+
+extern struct usart_module usart_instance;
 
 extern caddr_t _sbrk(int incr);
 extern int link(char *old, char *new);
@@ -113,6 +116,19 @@ extern void _kill(int pid, int sig)
 extern int _getpid(void)
 {
 	return -1;
+}
+
+int _write(int fd, char *ptr, int len)
+{
+    for (int i = 0; i < len; i++) usart_write_wait(&usart_instance, (uint16_t)ptr[i]);
+    return len;
+}
+
+int _read(int fd, char *ptr, int len)
+{
+    uint16_t rx;
+    if (usart_read_wait(&usart_instance, &rx) == STATUS_OK) { *ptr = (char)rx; return 1; }
+    return 0;
 }
 
 #ifdef __cplusplus

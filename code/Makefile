@@ -25,6 +25,7 @@ INCLUDES = \
 	-isystem $(ASF)/common/services/usb/class/cdc \
 	-isystem $(ASF)/common/services/usb/class/cdc/device \
 	-isystem $(ASF)/sam0/drivers/extint \
+	-isystem $(ASF)/sam0/drivers/gpio \
 	-isystem $(ASF)/sam0/drivers/port \
 	-isystem $(ASF)/sam0/drivers/system \
 	-isystem $(ASF)/sam0/drivers/system/clock \
@@ -34,6 +35,8 @@ INCLUDES = \
 	-isystem $(ASF)/sam0/drivers/system/pinmux \
 	-isystem $(ASF)/sam0/drivers/system/power/power_sam_d_r_h \
 	-isystem $(ASF)/sam0/drivers/system/reset/reset_sam_d_r_h \
+	-isystem $(ASF)/sam0/drivers/sercom \
+	-isystem $(ASF)/sam0/drivers/sercom/usart \
 	-isystem $(ASF)/sam0/drivers/usb \
 	-isystem $(ASF)/sam0/drivers/usb/usb_sam_d_r \
 	-isystem $(ASF)/sam0/drivers/usb/stack_interface \
@@ -97,6 +100,9 @@ CSRCS = \
 	$(ASF)/common/utils/interrupt/interrupt_sam_nvic.c \
 	$(ASF)/sam0/drivers/usb/usb_sam_d_r/usb.c \
 	$(ASF)/sam0/drivers/usb/stack_interface/usb_device_udd.c \
+	$(ASF)/sam0/drivers/sercom/sercom.c \
+	$(ASF)/sam0/drivers/sercom/sercom_interrupt.c \
+	$(ASF)/sam0/drivers/sercom/usart/usart.c \
 	$(ASF)/common/services/usb/udc/udc.c \
 	$(ASF)/common/services/usb/class/cdc/device/udi_cdc.c \
 	$(ASF)/common/services/usb/class/cdc/device/udi_cdc_desc.c
