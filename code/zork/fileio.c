@@ -46,7 +46,7 @@
 #include "zork1_dat.h"
 #include "string.h"
 
-#define MAX_DYNAMIC_MEMORY	12*1024
+#define MAX_DYNAMIC_MEMORY	11859   // Hardcoded for Zork 1. Needs to be adjusted for other game.
 
 /* Static data */
 
@@ -67,6 +67,7 @@ static uint16_t flash_get_word(uint32_t addr);
 void open_story(void)
 {
     dynamic_size = flash_get_word(0x0E);
+    printf("dynamic size %u: \r\n", dynamic_size);
 
     if (dynamic_size > sizeof(dynamic_memory)) {
         printf("Not enough memory for dynamic data\r\n");
