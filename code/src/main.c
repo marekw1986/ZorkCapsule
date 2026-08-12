@@ -20,14 +20,30 @@
 #define LED_PIN   17   // PA17 = D13
 #define LED_GROUP 0    // Port group A
 
+extern uint32_t _sstack, _estack;
+
 uint32_t blink_timer;
 struct usart_module usart_instance;
 
 static void initialize_uart(void);
 
+void stack_paint(void)
+{
+    uint32_t *p = &_sstack;
+    while (p < &_estack) *p++ = 0xDEADBEEF;
+}
+
+uint32_t stack_high_water_mark(void)
+{
+    uint32_t *p = &_sstack;
+    while (p < &_estack && *p == 0xDEADBEEF) p++;
+    return (uint32_t)((uint8_t*)&_estack - (uint8_t*)p);
+}
+
 int main(void)
 {
 	system_init();   /* configures XOSC, DFLL, GCLKs per conf_clocks.h */
+    stack_paint();
 
 	/* Configure PA17 (D13) as output, drive high to sanity-check GPIO */
 	PORT->Group[LED_GROUP].DIRSET.reg = (1 << LED_PIN);
@@ -42,6 +58,8 @@ int main(void)
     configure(V1, V8);
     initialize_screen();
     z_restart();
+    
+    printf("START!\r\n");
 
     while (1)
     {
@@ -55,11 +73,15 @@ int main(void)
             }
         }
         */
+        
+        //printf("stack free: %lu\r\n", stack_high_water_mark());
 
         if ((uint32_t)(millis() - blink_timer) > 1000) {
+            printf("TEST\r\n");
             blink_timer = millis();
-            PORT->Group[LED_GROUP].OUTTGL.reg = (1 << LED_PIN);
-        }  
+            //PORT->Group[LED_GROUP].OUTTGL.reg = (1 << LED_PIN);
+        }
+        
         
     }
 
@@ -129,8 +151,46 @@ void main_cdc_set_dtr(uint8_t port, bool b_enable)
 
 void HardFault_Handler(void)
 {
+    __asm volatile
+    (
+        " movs r0, #4       \n"
+        " mov  r1, lr       \n"
+        " tst  r0, r1       \n"
+        " beq  _msp         \n"
+        " mrs  r0, psp      \n"
+        " b    _hfh         \n"
+        "_msp:               \n"
+        " mrs  r0, msp      \n"
+        "_hfh:               \n"
+        " ldr  r1, =hard_fault_handler_c \n"
+        " bx   r1           \n"
+    );
+}
+
+void hard_fault_handler_c(uint32_t *stack_frame)
+{
+    /* Exception stack frame layout: r0 r1 r2 r3 r12 lr pc xpsr */
+    uint32_t r0  = stack_frame[0];
+    uint32_t r1  = stack_frame[1];
+    uint32_t r2  = stack_frame[2];
+    uint32_t r3  = stack_frame[3];
+    uint32_t r12 = stack_frame[4];
+    uint32_t lr  = stack_frame[5];
+    uint32_t pc  = stack_frame[6];
+    uint32_t psr = stack_frame[7];
+
+    printf("\r\n*** HARD FAULT ***\r\n");
+    printf("PC  = 0x%08lX\r\n", pc);
+    printf("LR  = 0x%08lX\r\n", lr);
+    printf("R0  = 0x%08lX\r\n", r0);
+    printf("R1  = 0x%08lX\r\n", r1);
+    printf("R2  = 0x%08lX\r\n", r2);
+    printf("R3  = 0x%08lX\r\n", r3);
+    printf("R12 = 0x%08lX\r\n", r12);
+    printf("PSR = 0x%08lX\r\n", psr);
+
     while (1) {
         PORT->Group[LED_GROUP].OUTTGL.reg = (1 << LED_PIN);
-        for (volatile uint32_t i = 0; i < 200000; i++);  // fast blink = fault
+        for (volatile uint32_t i = 0; i < 200000; i++);
     }
 }
