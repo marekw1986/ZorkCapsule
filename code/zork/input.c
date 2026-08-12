@@ -279,6 +279,9 @@ static void tokenise_line( zword_t char_buf, zword_t token_buf, zword_t dictiona
     /* Initialise dictionary */
 
     count = get_byte( dictionary++ );
+    if ( count > sizeof(punctuation) - 1 ) {
+        count = sizeof(punctuation) - 1;   /* prevent stack overflow from bad dictionary data */
+    }
     for ( i = 0; i < count; i++ )
     {
         punctuation[i] = get_byte( dictionary++ );
