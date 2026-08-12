@@ -12,6 +12,7 @@
 #include <udc.h>
 #include <udd.h>
 #include <usart.h>
+#include <port.h>
 #include "ztypes.h"
 #include "system_time.h"
 #include "conf_usb.h"
@@ -20,7 +21,12 @@
 #define LED_PIN   17   // PA17 = D13
 #define LED_GROUP 0    // Port group A
 
+#define GLOBALS 0x2271
+#define SCORE   ((uint16_t)dynamic_memory[GLOBALS + 2] << 8) | dynamic_memory[GLOBALS + 3]
+#define MOVES   ((uint16_t)dynamic_memory[GLOBALS + 4] << 8) | dynamic_memory[GLOBALS + 5]
+
 extern uint32_t _sstack, _estack;
+extern uint8_t dynamic_memory[];
 
 uint32_t blink_timer;
 struct usart_module usart_instance;
@@ -46,8 +52,12 @@ int main(void)
     stack_paint();
 
 	/* Configure PA17 (D13) as output, drive high to sanity-check GPIO */
-	PORT->Group[LED_GROUP].DIRSET.reg = (1 << LED_PIN);
-	PORT->Group[LED_GROUP].OUTSET.reg = (1 << LED_PIN);	
+    struct port_config pin_conf;
+    port_get_config_defaults(&pin_conf);
+
+    pin_conf.direction = PORT_PIN_DIR_OUTPUT;
+    port_pin_set_config(PIN_PA17, &pin_conf);
+    port_pin_set_output_level(PIN_PA17, true);
 
 	system_time_init();
 	initialize_uart();
@@ -65,21 +75,15 @@ int main(void)
     {
         zork_handle();
         
-        /*
-        if (udi_cdc_is_rx_ready()) {
-            char c = udi_cdc_getc();
-            if (udi_cdc_is_tx_ready()) {
-                udi_cdc_putc(c);
-            }
-        }
-        */
-        
         //printf("stack free: %lu\r\n", stack_high_water_mark());
 
         if ((uint32_t)(millis() - blink_timer) > 1000) {
-            printf("TEST\r\n");
+            
+            printf("TEST. Score: %u  Moves: %u\r\n", SCORE, MOVES);
+            
+            port_pin_toggle_output_level(PIN_PA17);
+            
             blink_timer = millis();
-            //PORT->Group[LED_GROUP].OUTTGL.reg = (1 << LED_PIN);
         }
         
         
@@ -190,7 +194,7 @@ void hard_fault_handler_c(uint32_t *stack_frame)
     printf("PSR = 0x%08lX\r\n", psr);
 
     while (1) {
-        PORT->Group[LED_GROUP].OUTTGL.reg = (1 << LED_PIN);
+        port_pin_toggle_output_level(PIN_PA17);
         for (volatile uint32_t i = 0; i < 200000; i++);
     }
 }
