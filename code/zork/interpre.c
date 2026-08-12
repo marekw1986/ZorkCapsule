@@ -1004,6 +1004,9 @@ void zork_handle(void) {
 
                     //vga_putc('\n');
                     if (udi_cdc_is_tx_ready()) {
+                        udi_cdc_putc('\r');
+                    }
+                    if (udi_cdc_is_tx_ready()) {
                         udi_cdc_putc('\n');
                     }
                     state = VM_RUNNING;
@@ -1019,6 +1022,12 @@ void zork_handle(void) {
                         set_byte(addr, ' ');
                         // Visual erase
                         //vga_putc('\b');  // you'll need to implement \b in vga_putc
+                        if (udi_cdc_is_tx_ready()) {
+                            udi_cdc_putc('\b');
+                        }
+                        if (udi_cdc_is_tx_ready()) {
+                            udi_cdc_putc(' ');
+                        }
                         if (udi_cdc_is_tx_ready()) {
                             udi_cdc_putc('\b');
                         }
