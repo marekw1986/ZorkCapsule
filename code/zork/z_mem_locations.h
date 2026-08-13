@@ -2,8 +2,8 @@
 #define _Z_MEM_LOCATIONS_H_
 
 #define GLOBALS 		0x2271
-#define SCORE   		((uint16_t)dynamic_memory[GLOBALS + 2] << 8) | dynamic_memory[GLOBALS + 3]
-#define MOVES   		((uint16_t)dynamic_memory[GLOBALS + 4] << 8) | dynamic_memory[GLOBALS + 5]
+#define SCORE   		(((uint16_t)dynamic_memory[GLOBALS + 2] << 8) | dynamic_memory[GLOBALS + 3])
+#define MOVES   		(((uint16_t)dynamic_memory[GLOBALS + 4] << 8) | dynamic_memory[GLOBALS + 5])
 
 #define SWORD_GLOW 		dynamic_memory[0x15c2]   // 0 = off, 1 = faint blue, 2 = bright
 //#define SWORD_TVALUE 	((uint16_t)dynamic_memory[0x15c1] << 8) | dynamic_memory[0x15c2]

@@ -681,6 +681,9 @@ static void monitor(void) {
     
     if (previous_location != PLAYER_LOC) {
         printf("Player moved to location id: %u\r\n", PLAYER_LOC);
+        if ( (PLAYER_LOC == STONE_BARROW_ROOM) && (SCORE == 350) ) {
+            // Victory!
+        }
         previous_location = PLAYER_LOC;
     }
 }
