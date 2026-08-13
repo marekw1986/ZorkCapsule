@@ -21,9 +21,11 @@
 #define LED_PIN   17   // PA17 = D13
 #define LED_GROUP 0    // Port group A
 
-#define GLOBALS 0x2271
-#define SCORE   ((uint16_t)dynamic_memory[GLOBALS + 2] << 8) | dynamic_memory[GLOBALS + 3]
-#define MOVES   ((uint16_t)dynamic_memory[GLOBALS + 4] << 8) | dynamic_memory[GLOBALS + 5]
+#define GLOBALS 		0x2271
+#define SCORE   		((uint16_t)dynamic_memory[GLOBALS + 2] << 8) | dynamic_memory[GLOBALS + 3]
+#define MOVES   		((uint16_t)dynamic_memory[GLOBALS + 4] << 8) | dynamic_memory[GLOBALS + 5]
+#define SWORD_GLOW 		dynamic_memory[0x15c2]   // 0 = off, 1 = faint blue, 2 = bright
+//#define SWORD_TVALUE 	((uint16_t)dynamic_memory[0x15c1] << 8) | dynamic_memory[0x15c2]
 
 extern uint32_t _sstack, _estack;
 extern uint8_t dynamic_memory[];
@@ -79,7 +81,7 @@ int main(void)
 
         if ((uint32_t)(millis() - blink_timer) > 1000) {
             
-            printf("TEST. Score: %u  Moves: %u\r\n", SCORE, MOVES);
+            printf("TEST. Score: %u  Moves: %u, Sword Glow: %u\r\n", SCORE, MOVES, SWORD_GLOW);
             
             port_pin_toggle_output_level(PIN_PA17);
             
