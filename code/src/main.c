@@ -17,6 +17,7 @@
 #include "z_mem_locations.h"
 #include "system_time.h"
 #include "conf_usb.h"
+#include "lock.h"
 #include "main.h"
 
 #define LED_PIN   17   // PA17 = D13

@@ -71,6 +71,7 @@ TARGET = $(BUILD)/zorkcapsule
 
 CSRCS = \
 	src/main.c \
+	src/lock.c \
 	src/system_time.c \
 	src/syscalls.c \
 	zork/configur.c \

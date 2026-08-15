@@ -43,6 +43,7 @@
 #include <udi_cdc.h>
 #include "ztypes.h"
 #include "z_mem_locations.h"
+#include "lock.h"
 
 vm_state_t state;
 
@@ -683,6 +684,7 @@ static void monitor(void) {
         printf("Player moved to location id: %u\r\n", PLAYER_LOC);
         if ( (PLAYER_LOC == STONE_BARROW_ROOM) && (SCORE == 350) ) {
             // Victory!
+            open_lock();
         }
         previous_location = PLAYER_LOC;
     }
