@@ -13,12 +13,11 @@
 #include <udd.h>
 #include <usart.h>
 #include <port.h>
-#include <tcc.h>
 #include "ztypes.h"
 #include "z_mem_locations.h"
 #include "system_time.h"
 #include "conf_usb.h"
-#include "lock.h"
+#include "box_control.h"
 #include "main.h"
 
 #define LED_PIN   17   // PA17 = D13
@@ -30,11 +29,8 @@ uint32_t memory_guard;
 
 uint32_t blink_timer;
 struct usart_module usart_instance;
-struct tcc_module tcc0_instance;
-struct tcc_module tcc2_instance;
 
 static void initialize_uart(void);
-static void initialize_pwm(void);
 
 void stack_paint(void)
 {
@@ -113,35 +109,6 @@ static void initialize_uart(void) {
     while (usart_init(&usart_instance, SERCOM0, &config_usart) != STATUS_OK) {}
 
     usart_enable(&usart_instance);
-}
-
-static void initialize_pwm(void)
-{
-    struct tcc_config config_tcc0;
-    tcc_get_config_defaults(&config_tcc0, TCC0);
-    config_tcc0.counter.period = 255;
-    config_tcc0.compare.wave_generation = TCC_WAVE_GENERATION_SINGLE_SLOPE_PWM;
-    config_tcc0.compare.match[0] = 0;   /* LED1 duty, CC0 -> WO[4] */
-    config_tcc0.compare.match[1] = 0;   /* LED2 duty, CC1 -> WO[5] */
-    config_tcc0.pins.enable_wave_out_pin[4] = true;
-    config_tcc0.pins.wave_out_pin[4]        = PIN_PA14F_TCC0_WO4;
-    config_tcc0.pins.wave_out_pin_mux[4]    = MUX_PA14F_TCC0_WO4;
-    config_tcc0.pins.enable_wave_out_pin[5] = true;
-    config_tcc0.pins.wave_out_pin[5]        = PIN_PA15F_TCC0_WO5;
-    config_tcc0.pins.wave_out_pin_mux[5]    = MUX_PA15F_TCC0_WO5;
-    tcc_init(&tcc0_instance, TCC0, &config_tcc0);
-    tcc_enable(&tcc0_instance);
-
-    struct tcc_config config_tcc2;
-    tcc_get_config_defaults(&config_tcc2, TCC2);
-    config_tcc2.counter.period = 255;
-    config_tcc2.compare.wave_generation = TCC_WAVE_GENERATION_SINGLE_SLOPE_PWM;
-    config_tcc2.compare.match[0] = 0;   /* meter duty, WO[0] */
-    config_tcc2.pins.enable_wave_out_pin[0] = true;
-    config_tcc2.pins.wave_out_pin[0]        = PIN_PA16E_TCC2_WO0;
-    config_tcc2.pins.wave_out_pin_mux[0]    = MUX_PA16E_TCC2_WO0;
-    tcc_init(&tcc2_instance, TCC2, &config_tcc2);
-    tcc_enable(&tcc2_instance);
 }
 
 void main_suspend_action(void) {

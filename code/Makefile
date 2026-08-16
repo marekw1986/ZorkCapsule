@@ -37,6 +37,7 @@ INCLUDES = \
 	-isystem $(ASF)/sam0/drivers/system/reset/reset_sam_d_r_h \
 	-isystem $(ASF)/sam0/drivers/sercom \
 	-isystem $(ASF)/sam0/drivers/sercom/usart \
+	-isystem $(ASF)/sam0/drivers/tcc \
 	-isystem $(ASF)/sam0/drivers/usb \
 	-isystem $(ASF)/sam0/drivers/usb/usb_sam_d_r \
 	-isystem $(ASF)/sam0/drivers/usb/stack_interface \
@@ -71,7 +72,7 @@ TARGET = $(BUILD)/zorkcapsule
 
 CSRCS = \
 	src/main.c \
-	src/lock.c \
+	src/box_control.c \
 	src/system_time.c \
 	src/syscalls.c \
 	zork/configur.c \
@@ -104,6 +105,7 @@ CSRCS = \
 	$(ASF)/sam0/drivers/sercom/sercom.c \
 	$(ASF)/sam0/drivers/sercom/sercom_interrupt.c \
 	$(ASF)/sam0/drivers/sercom/usart/usart.c \
+	$(ASF)/sam0/drivers/tcc/tcc.c \
 	$(ASF)/common/services/usb/udc/udc.c \
 	$(ASF)/common/services/usb/class/cdc/device/udi_cdc.c \
 	$(ASF)/common/services/usb/class/cdc/device/udi_cdc_desc.c

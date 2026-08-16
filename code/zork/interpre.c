@@ -43,7 +43,7 @@
 #include <udi_cdc.h>
 #include "ztypes.h"
 #include "z_mem_locations.h"
-#include "lock.h"
+#include "box_control.h"
 
 vm_state_t state;
 
@@ -629,6 +629,8 @@ static void monitor(void) {
     static uint8_t previous_lantern_held_state = 0;
     static uint8_t previous_lantern_on_state = 0;
     static uint8_t previous_location = 0;
+    
+    set_score_indicator(SCORE);
     
     if (previous_lantern_held_state != LANTERN_HELD) {
         if (LANTERN_HELD) {
