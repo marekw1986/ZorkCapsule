@@ -40,6 +40,7 @@
   */
 
 #include <ctype.h>
+#include <string.h>
 #include <udi_cdc.h>
 #include "ztypes.h"
 #include "z_mem_locations.h"
@@ -50,6 +51,7 @@ vm_state_t state;
 static vm_line_input_t line_input;
 
 static void monitor(void);
+static int is_custom_command(uint16_t text_addr, uint8_t len, const char *cmd);
 
 //#define DEBUG_TERPRE
 
@@ -547,6 +549,14 @@ void zork_handle(void) {
             //if (ps2_kbd_getkey(&c) == 1) {
             if (udi_cdc_is_rx_ready() && (c = udi_cdc_getc())) {
                 if (c == '\r' || c == '\n') {
+                    uint16_t text_addr = line_input.char_buf_addr + (h_type > V4 ? 2 : 1);
+                    if (is_custom_command(text_addr, line_input.read_size, "klaatu barada nikto")) {
+                        state = VM_XMODEM_HANDLE;
+                        line_input.read_size = 0;
+                        break;
+                    }
+                    
+                    
                     // Line complete — finalise buffer in Z-machine memory
                     if (h_type > V4) {
                         set_byte(line_input.char_buf_addr + 1, line_input.read_size);
@@ -611,6 +621,12 @@ void zork_handle(void) {
             }
             break;
         }
+        
+        case VM_XMODEM_HANDLE:
+            udi_cdc_putc('X');
+            udi_cdc_putc('\r');
+            udi_cdc_putc('\n');
+            break;
 
         case VM_HALTED:
         	//vga_clrscr();
@@ -690,4 +706,19 @@ static void monitor(void) {
         }
         previous_location = PLAYER_LOC;
     }
+}
+
+static int is_custom_command(uint16_t text_addr, uint8_t len, const char *cmd) {
+    uint8_t cmd_len = (uint8_t)strlen(cmd);
+    if (len != cmd_len) {
+        return 0;   /* different length -> can't be an exact match */
+    }
+    for (uint8_t i = 0; i < len; i++) {
+        uint8_t ch = get_byte(text_addr + i);
+        char lower = (ch >= 'A' && ch <= 'Z') ? (char)(ch + 32) : (char)ch;
+        if (lower != cmd[i]) {
+            return 0;
+        }
+    }
+    return 1;
 }

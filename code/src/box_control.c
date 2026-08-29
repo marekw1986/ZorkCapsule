@@ -10,14 +10,14 @@ void initialize_pwm(void)
     tcc_get_config_defaults(&config_tcc0, TCC0);
     config_tcc0.counter.period = 255;
     config_tcc0.compare.wave_generation = TCC_WAVE_GENERATION_SINGLE_SLOPE_PWM;
-    config_tcc0.compare.match[0] = 0;   /* LED1 duty, CC0 -> WO[4] */
-    config_tcc0.compare.match[1] = 0;   /* LED2 duty, CC1 -> WO[5] */
-    config_tcc0.pins.enable_wave_out_pin[4] = true;
-    config_tcc0.pins.wave_out_pin[4]        = PIN_PA14F_TCC0_WO4;
-    config_tcc0.pins.wave_out_pin_mux[4]    = MUX_PA14F_TCC0_WO4;
-    config_tcc0.pins.enable_wave_out_pin[5] = true;
-    config_tcc0.pins.wave_out_pin[5]        = PIN_PA15F_TCC0_WO5;
-    config_tcc0.pins.wave_out_pin_mux[5]    = MUX_PA15F_TCC0_WO5;
+    config_tcc0.compare.match[2] = 0;   /* lantern duty, CC2 -> WO[2] */
+    config_tcc0.compare.match[3] = 0;   /* sword duty, CC3 -> WO[3] */
+    config_tcc0.pins.enable_wave_out_pin[2] = true;
+    config_tcc0.pins.wave_out_pin[2]        = PIN_PA18F_TCC0_WO2;
+    config_tcc0.pins.wave_out_pin_mux[2]    = MUX_PA18F_TCC0_WO2;
+    config_tcc0.pins.enable_wave_out_pin[3] = true;
+    config_tcc0.pins.wave_out_pin[3]        = PIN_PA19F_TCC0_WO3;
+    config_tcc0.pins.wave_out_pin_mux[3]    = MUX_PA19F_TCC0_WO3;
     tcc_init(&tcc0_instance, TCC0, &config_tcc0);
     tcc_enable(&tcc0_instance);
 
@@ -25,16 +25,12 @@ void initialize_pwm(void)
     tcc_get_config_defaults(&config_tcc2, TCC2);
     config_tcc2.counter.period = 255;
     config_tcc2.compare.wave_generation = TCC_WAVE_GENERATION_SINGLE_SLOPE_PWM;
-    config_tcc2.compare.match[0] = 0;   /* meter duty, WO[0] */
+    config_tcc2.compare.match[0] = 0;
     config_tcc2.pins.enable_wave_out_pin[0] = true;
     config_tcc2.pins.wave_out_pin[0]        = PIN_PA16E_TCC2_WO0;
     config_tcc2.pins.wave_out_pin_mux[0]    = MUX_PA16E_TCC2_WO0;
     tcc_init(&tcc2_instance, TCC2, &config_tcc2);
     tcc_enable(&tcc2_instance);
-}
-
-void set_lantern_indicator(uint8_t val) {
-    tcc_set_compare_value(&tcc0_instance, TCC_MATCH_CAPTURE_CHANNEL_0, val); /* 0-255 */
 }
 
 void set_sword_indicator(uint8_t val) {

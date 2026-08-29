@@ -1,6 +1,6 @@
-CC      = arm-none-eabi-gcc
-OBJCOPY = arm-none-eabi-objcopy
-SIZE    = arm-none-eabi-size
+CC      = /opt/arm-none-eabi/bin/arm-none-eabi-gcc
+OBJCOPY = /opt/arm-none-eabi/bin/arm-none-eabi-objcopy
+SIZE    = /opt/arm-none-eabi/bin/arm-none-eabi-size
 
 OPENOCD = openocd
 OPENOCD_INTERFACE = interface/stlink.cfg
@@ -73,6 +73,7 @@ TARGET = $(BUILD)/zorkcapsule
 CSRCS = \
 	src/main.c \
 	src/box_control.c \
+	src/xmodem.c \
 	src/system_time.c \
 	src/syscalls.c \
 	zork/configur.c \
