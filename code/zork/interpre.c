@@ -45,6 +45,7 @@
 #include "ztypes.h"
 #include "z_mem_locations.h"
 #include "box_control.h"
+#include "xmodem.h"
 
 vm_state_t state;
 
@@ -553,6 +554,7 @@ void zork_handle(void) {
                     if (is_custom_command(text_addr, line_input.read_size, "klaatu barada nikto")) {
                         state = VM_XMODEM_HANDLE;
                         line_input.read_size = 0;
+                        xmodem_start();
                         break;
                     }
                     
@@ -623,6 +625,17 @@ void zork_handle(void) {
         }
         
         case VM_XMODEM_HANDLE:
+			xmodem_status_t st = xmodem_poll();
+			if (st == XMODEM_BUSY) { break; }
+			
+			state = VM_WAIT_LINE;
+			if (st == XMODEM_DONE_OK) {
+				// Transfer ok
+			}
+			else {
+				// Transfer failed
+			}
+        
             udi_cdc_putc('X');
             udi_cdc_putc('\r');
             udi_cdc_putc('\n');
