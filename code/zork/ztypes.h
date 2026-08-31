@@ -282,6 +282,7 @@ typedef short ZINT16;           /*   signed 2 byte quantity */
 /* Data access */
 
 typedef enum {
+    VM_CONNECTION_WAIT,
     VM_RUNNING,
     VM_WAIT_CHAR,    // z_read_char waiting for single keypress
     VM_WAIT_LINE,    // z_sread_aread waiting for full line + Enter

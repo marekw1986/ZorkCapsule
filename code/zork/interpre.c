@@ -40,12 +40,15 @@
   */
 
 #include <ctype.h>
+#include <stdbool.h>
 #include <string.h>
 #include <udi_cdc.h>
 #include "ztypes.h"
 #include "z_mem_locations.h"
 #include "box_control.h"
 #include "xmodem.h"
+
+bool zork_enabled = false;
 
 vm_state_t state;
 
@@ -529,6 +532,11 @@ void vm_tick(void) {
 
 void zork_handle(void) {
     switch (state) {
+        case VM_CONNECTION_WAIT:
+            if (!zork_enabled) { break; }
+            state = VM_RUNNING;
+            break;
+        
         case VM_RUNNING:
             vm_tick();
             monitor();

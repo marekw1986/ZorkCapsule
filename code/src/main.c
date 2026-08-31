@@ -1,5 +1,6 @@
 #include <clock.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <io.h>
 #include <compiler.h>
@@ -19,12 +20,14 @@
 #include "system_time.h"
 #include "conf_usb.h"
 #include "box_control.h"
+#include "eeprom_25lc.h"
 #include "main.h"
 
 #define LED_PIN   17   // PA17 = D13
 #define LED_GROUP 0    // Port group A
 
 extern uint32_t _sstack, _estack;
+extern bool zork_enabled;
 
 uint32_t memory_guard;
 
@@ -62,6 +65,7 @@ int main(void)
 
 	system_time_init();
 	initialize_uart();
+    eeprom_hw_init();
 	
 	udc_start();
     
@@ -146,13 +150,7 @@ void cdc_rx_notify(uint8_t port)
 void main_cdc_set_dtr(uint8_t port, bool b_enable)
 {
 	if (b_enable) {
-		//ui_com_open(port);
-		//b_com_port_opened = true;
-        printf("USB DTR on\r\n");
-	}else{
-		//ui_com_close(port);
-		//b_com_port_opened = false;
-        printf("USB DTR off\r\n");
+        zork_enabled = true;
 	}
 }
 

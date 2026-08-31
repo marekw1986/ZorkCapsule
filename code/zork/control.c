@@ -209,7 +209,7 @@ void z_restart( void )
     fp = STACK_SIZE - 1;
 
     interpreter_status = 1;
-    state = VM_RUNNING;
+    state = VM_CONNECTION_WAIT;
 
 }                               /* z_restart */
 
