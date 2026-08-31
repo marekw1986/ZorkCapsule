@@ -385,6 +385,7 @@ int input_line( int, unsigned long, int, int * );
 /* interpre.c */
 
 //int interpret( void );
+void udi_cdc_puts(const char* str);
 int vm_step(void);
 void zork_handle(void);
 
