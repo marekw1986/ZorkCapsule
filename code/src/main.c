@@ -13,6 +13,7 @@
 #include <udd.h>
 #include <usart.h>
 #include <port.h>
+#include <spi.h>
 #include "ztypes.h"
 #include "z_mem_locations.h"
 #include "system_time.h"
