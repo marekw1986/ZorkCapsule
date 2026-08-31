@@ -36,6 +36,7 @@ INCLUDES = \
 	-isystem $(ASF)/sam0/drivers/system/power/power_sam_d_r_h \
 	-isystem $(ASF)/sam0/drivers/system/reset/reset_sam_d_r_h \
 	-isystem $(ASF)/sam0/drivers/sercom \
+	-isystem $(ASF)/sam0/drivers/sercom/spi \
 	-isystem $(ASF)/sam0/drivers/sercom/usart \
 	-isystem $(ASF)/sam0/drivers/tcc \
 	-isystem $(ASF)/sam0/drivers/usb \
@@ -46,7 +47,7 @@ INCLUDES = \
 CFLAGS = \
     -mcpu=cortex-m0plus \
     -mthumb \
-    -D__SAMD21E18A__ \
+    -D__SAMD21G18A__ \
     -Os \
     -g \
     -Wall \
@@ -60,7 +61,7 @@ LDFLAGS = \
     --specs=nosys.specs \
     -Wl,--defsym,__stack_size__=0x800 \
     -Wl,--defsym,__heap_size__=0x400 \
-    -Wl,-T,samd21e18a_flash.ld \
+    -Wl,-T,samd21g18a_flash.ld \
     -Wl,--gc-sections \
 	-Wl,-Map,$(TARGET).map,--cref
 	
@@ -74,6 +75,7 @@ CSRCS = \
 	src/main.c \
 	src/box_control.c \
 	src/xmodem.c \
+	src/eeprom_25lc.c \
 	src/system_time.c \
 	src/syscalls.c \
 	zork/configur.c \
@@ -105,6 +107,7 @@ CSRCS = \
 	$(ASF)/sam0/drivers/usb/stack_interface/usb_device_udd.c \
 	$(ASF)/sam0/drivers/sercom/sercom.c \
 	$(ASF)/sam0/drivers/sercom/sercom_interrupt.c \
+	$(ASF)/sam0/drivers/sercom/spi/spi.c \
 	$(ASF)/sam0/drivers/sercom/usart/usart.c \
 	$(ASF)/sam0/drivers/tcc/tcc.c \
 	$(ASF)/common/services/usb/udc/udc.c \
