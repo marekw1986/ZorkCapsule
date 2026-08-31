@@ -58,6 +58,14 @@ static int is_custom_command(uint16_t text_addr, uint8_t len, const char *cmd);
 
 static int halt = FALSE;
 
+void udi_cdc_puts(const char* str) {
+    while(*str) {
+        if (!udi_cdc_is_tx_ready()) {break;}
+        udi_cdc_putc(*str);
+        str++;
+    }
+}
+
 int vm_step(void) {
 	zbyte_t opcode;
     zword_t specifier, operand[8];
@@ -554,6 +562,7 @@ void zork_handle(void) {
                     if (is_custom_command(text_addr, line_input.read_size, "klaatu barada nikto")) {
                         state = VM_XMODEM_HANDLE;
                         line_input.read_size = 0;
+                        udi_cdc_puts("\r\n");
                         xmodem_start();
                         break;
                     }
@@ -625,21 +634,19 @@ void zork_handle(void) {
         }
         
         case VM_XMODEM_HANDLE:
+        {
 			xmodem_status_t st = xmodem_poll();
 			if (st == XMODEM_BUSY) { break; }
 			
 			state = VM_WAIT_LINE;
 			if (st == XMODEM_DONE_OK) {
-				// Transfer ok
+				udi_cdc_puts("\r\nXModem transfer finished successfully.\r\n\r\n>");
 			}
 			else {
-				// Transfer failed
+				udi_cdc_puts("\r\nXModem tranfer failed.\r\n\r\n>");
 			}
-        
-            udi_cdc_putc('X');
-            udi_cdc_putc('\r');
-            udi_cdc_putc('\n');
             break;
+        }
 
         case VM_HALTED:
         	//vga_clrscr();

@@ -14,7 +14,7 @@
  * NAKs any STX (1K) block header, forcing the sender to 128-byte
  * blocks (the default for most terminal "XMODEM" sends anyway --
  * 1K/XMODEM-1K is usually a separate option). */
-#define XMODEM_ALLOW_1K   1
+//#define XMODEM_ALLOW_1K   1
 
 #if XMODEM_ALLOW_1K
 #define XMODEM_MAX_BLOCK  1024
