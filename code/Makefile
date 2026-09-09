@@ -76,6 +76,7 @@ CSRCS = \
 	src/box_control.c \
 	src/xmodem.c \
 	src/eeprom_25lc.c \
+	src/eeprom_slots.c \
 	src/system_time.c \
 	src/syscalls.c \
 	zork/configur.c \

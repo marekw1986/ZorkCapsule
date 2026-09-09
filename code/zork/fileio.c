@@ -42,6 +42,7 @@
 //#include <SdFat.h>
 //#include <SdFatUtil.h>
 //#include "fatfs.h"
+#include "eeprom_slots.h"
 #include "ztypes.h"
 #include "zork1_dat.h"
 #include "string.h"
@@ -54,8 +55,10 @@ extern int GLOBALVER;
 
 uint16_t dynamic_size = 0;
 uint8_t dynamic_memory[MAX_DYNAMIC_MEMORY];
+uint8_t save_slot = 0;
 
 static uint16_t flash_get_word(uint32_t addr);
+static int validate_save(void);
 
 /*
  * open_story
@@ -133,7 +136,8 @@ int z_save( int argc, zword_t table, zword_t bytes, zword_t name )
     int status = 0;
 
     /* Get the file name */
-    status = 1;
+    //status = 1;
+    eeprom_slot_write(save_slot, 0, dynamic_memory, dynamic_size);
 
     /* Return result of save to Z-code */
 
@@ -146,7 +150,7 @@ int z_save( int argc, zword_t table, zword_t bytes, zword_t name )
         store_operand( (zword_t)(( status == 0 ) ? 1 : 0) );
     }
 
-    udi_cdc_puts("\nSaving not supported in this build.\r\n");
+    //udi_cdc_puts("\nSaving not supported in this build.\r\n");
 
     return ( status );
 }                               /* z_save */
@@ -162,12 +166,19 @@ int z_save( int argc, zword_t table, zword_t bytes, zword_t name )
 
 int z_restore( int argc, zword_t table, zword_t bytes, zword_t name )
 {
-    int status;
+    int status = 0;
 
-    status = 1;
+    if (!validate_save()) {
+        udi_cdc_puts("Restore aborted.\r\n");
+        status = 1;
+        goto done;
+    }
+
+    eeprom_slot_read(save_slot, 0, dynamic_memory,dynamic_size);
 
     /* Return result of save to Z-code */
 
+done:
     if ( h_type < V4 )
     {
         conditional_jump( status == 0 );
@@ -177,7 +188,7 @@ int z_restore( int argc, zword_t table, zword_t bytes, zword_t name )
         store_operand( (zword_t)(( status == 0 ) ? 2 : 0) );
     }
 
-    udi_cdc_puts("\nSaving not supported in this build.\r\n");
+    //udi_cdc_puts("\nSaving not supported in this build.\r\n");
 
     return ( status );
 }                               /* z_restore */
@@ -314,3 +325,26 @@ static uint16_t flash_get_word(uint32_t addr)
     return ((uint16_t)zork1_dat[addr] << 8) | zork1_dat[addr + 1];
 }
 
+static int validate_save(void) {
+    // Offsets to check in the header
+    static const int check_offsets[] = {
+        0x00,                          // version
+        0x02, 0x03,                    // release number
+        0x12, 0x13, 0x14, 0x15, 0x16, 0x17  // serial number
+    };
+    static const int num_checks = sizeof(check_offsets) / sizeof(check_offsets[0]);
+
+    for (int i = 0; i < num_checks; i++) {
+        uint8_t save_byte;
+        eeprom_slot_read(save_slot, check_offsets[i], &save_byte, 1);
+
+        // Compare against currently loaded game's dynamic memory
+        uint32_t a = check_offsets[i];
+        uint8_t game_byte = get_byte(a);
+        if (save_byte != game_byte) {
+            udi_cdc_puts("Save file is for a different game or release.\r\n");
+            return 0;
+        }
+    }
+    return 1;
+}

@@ -47,6 +47,9 @@
 #include "z_mem_locations.h"
 #include "box_control.h"
 #include "xmodem.h"
+#include "eeprom_slots.h"
+
+extern uint8_t save_slot;
 
 bool zork_enabled = false;
 
@@ -56,6 +59,7 @@ static vm_line_input_t line_input;
 
 static void monitor(void);
 static int is_custom_command(uint16_t text_addr, uint8_t len, const char *cmd);
+static uint8_t is_custom_command_with_number(uint16_t text_addr, uint8_t len, const char *cmd, uint8_t *number);
 
 //#define DEBUG_TERPRE
 
@@ -574,6 +578,38 @@ void zork_handle(void) {
                         xmodem_start();
                         break;
                     }
+                    if (is_custom_command(text_addr, line_input.read_size, "test_save")) {
+                        udi_cdc_puts("\r\nTesting save\r\n");
+                        const char* str = "nice";
+                        eeprom_slot_write(0, 0, (const uint8_t*)str, strlen(str));
+                        char buf[10];
+                        eeprom_slot_read(0, 0, (uint8_t*)buf, sizeof(buf));
+                        udi_cdc_puts(buf);
+                        line_input.read_size = 0;
+                        udi_cdc_puts("\r\n");
+                        xmodem_start();
+                        break;
+                    }
+                    uint8_t slot;
+                    uint8_t result = is_custom_command_with_number(text_addr, line_input.read_size, "save", &slot);
+                    if (result == 1) {
+                        // No slot specified, defaulting to 0
+                        udi_cdc_puts("\r\nSlot not specified, defaulting to 0\r\n");
+                        save_slot = 0;
+                    }
+                    else if (result == 2) {
+                        if (slot >= SLOT_COUNT) {
+                            udi_cdc_puts("\r\nSpecified slot outside of supported range 0-");
+                            udi_cdc_putc('0' + (SLOT_COUNT-1));
+                            udi_cdc_puts("\r\nDefaulting to slot 0\r\n");
+                            save_slot = 0;
+                            line_input.read_size = 4;
+                        }
+                        else {
+                            save_slot = slot;
+                            line_input.read_size = 4;
+                        }
+                    }
                     
                     
                     // Line complete — finalise buffer in Z-machine memory
@@ -749,4 +785,70 @@ static int is_custom_command(uint16_t text_addr, uint8_t len, const char *cmd) {
         }
     }
     return 1;
+}
+
+static uint8_t is_custom_command_with_number(uint16_t text_addr, uint8_t len, const char *cmd, uint8_t *number) {
+    uint8_t cmd_len = (uint8_t)strlen(cmd);
+    uint8_t i;
+    uint16_t value = 0;
+
+    if (number != NULL) {
+        *number = 0;
+    }
+
+    if (len < cmd_len) {
+        return 0;
+    }
+
+    /* Compare command, case-insensitively. */
+    for (i = 0; i < cmd_len; i++) {
+        uint8_t ch = get_byte(text_addr + i);
+
+        if (ch >= 'A' && ch <= 'Z') {
+            ch += 'a' - 'A';
+        }
+
+        if (ch != (uint8_t)cmd[i]) {
+            return 0;
+        }
+    }
+
+    /* Command without a number. */
+    if (len == cmd_len) {
+        return 1;
+    }
+
+    /* Skip spaces after command. */
+    i = cmd_len;
+    while (i < len && get_byte(text_addr + i) == ' ') {
+        i++;
+    }
+
+    /* Only command + spaces. */
+    if (i == len) {
+        return 1;
+    }
+
+    /* Parse decimal number. */
+    while (i < len) {
+        uint8_t ch = get_byte(text_addr + i);
+
+        if (ch < '0' || ch > '9') {
+            return 0;
+        }
+
+        value = value * 10 + (ch - '0');
+
+        if (value > 255) {
+            return 0;
+        }
+
+        i++;
+    }
+
+    if (number != NULL) {
+        *number = (uint8_t)value;
+    }
+
+    return 2;
 }
