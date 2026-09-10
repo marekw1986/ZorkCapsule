@@ -137,7 +137,8 @@ int z_save( int argc, zword_t table, zword_t bytes, zword_t name )
 
     /* Get the file name */
     //status = 1;
-    eeprom_slot_write(save_slot, 0, dynamic_memory, dynamic_size);
+    eeprom_status_t res = eeprom_slot_write(save_slot, 0, dynamic_memory, dynamic_size);
+    status = (res != EEPROM_OK);
 
     /* Return result of save to Z-code */
 
@@ -174,7 +175,8 @@ int z_restore( int argc, zword_t table, zword_t bytes, zword_t name )
         goto done;
     }
 
-    eeprom_slot_read(save_slot, 0, dynamic_memory,dynamic_size);
+    eeprom_status_t res = eeprom_slot_read(save_slot, 0, dynamic_memory,dynamic_size);
+    status = (res != EEPROM_OK);
 
     /* Return result of save to Z-code */
 

@@ -51,7 +51,14 @@ uint32_t stack_high_water_mark(void)
 
 int main(void)
 {
-	system_init();   /* configures XOSC, DFLL, GCLKs per conf_clocks.h */
+    SYSCTRL->BOD33.reg = SYSCTRL_BOD33_LEVEL(48) |      /* threshold, check datasheet table for mV mapping */
+                          SYSCTRL_BOD33_ACTION_RESET |
+                          SYSCTRL_BOD33_HYST |
+                          SYSCTRL_BOD33_ENABLE;
+
+    while (!SYSCTRL->PCLKSR.bit.B33SRDY);   /* wait for BOD33 sync ready, not BOD33RDY */	
+    
+    system_init();   /* configures XOSC, DFLL, GCLKs per conf_clocks.h */
     initialize_pwm();
     stack_paint();
 

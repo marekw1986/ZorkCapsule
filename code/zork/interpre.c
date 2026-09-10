@@ -60,6 +60,7 @@ static vm_line_input_t line_input;
 static void monitor(void);
 static int is_custom_command(uint16_t text_addr, uint8_t len, const char *cmd);
 static uint8_t is_custom_command_with_number(uint16_t text_addr, uint8_t len, const char *cmd, uint8_t *number);
+static uint8_t is_slot_in_supported_range(uint8_t slot);
 
 //#define DEBUG_TERPRE
 
@@ -590,24 +591,37 @@ void zork_handle(void) {
                         xmodem_start();
                         break;
                     }
-                    uint8_t slot;
-                    uint8_t result = is_custom_command_with_number(text_addr, line_input.read_size, "save", &slot);
-                    if (result == 1) {
-                        // No slot specified, defaulting to 0
-                        udi_cdc_puts("\r\nSlot not specified, defaulting to 0\r\n");
-                        save_slot = 0;
-                    }
-                    else if (result == 2) {
-                        if (slot >= SLOT_COUNT) {
-                            udi_cdc_puts("\r\nSpecified slot outside of supported range 0-");
-                            udi_cdc_putc('0' + (SLOT_COUNT-1));
-                            udi_cdc_puts("\r\nDefaulting to slot 0\r\n");
-                            save_slot = 0;
-                            line_input.read_size = 4;
+                    {
+                        uint8_t slot;
+                        uint8_t result;
+                        uint8_t command_len = 0;
+
+                        result = is_custom_command_with_number(
+                            text_addr, line_input.read_size, "save", &slot);
+
+                        if (result == 0) {
+                            result = is_custom_command_with_number(
+                                text_addr, line_input.read_size, "restore", &slot);
+
+                            if (result != 0)
+                                command_len = 7;
                         }
                         else {
+                            command_len = 4;
+                        }
+
+                        if (result == 1) {
+                            udi_cdc_puts("\r\nSlot not specified, defaulting to 0\r\n");
+                            save_slot = 0;
+                        }
+                        else if (result == 2) {
+                            if (!is_slot_in_supported_range(slot)) {
+                                line_input.read_size = 0;
+                                break;
+                            }
+
                             save_slot = slot;
-                            line_input.read_size = 4;
+                            line_input.read_size = command_len;
                         }
                     }
                     
@@ -851,4 +865,14 @@ static uint8_t is_custom_command_with_number(uint16_t text_addr, uint8_t len, co
     }
 
     return 2;
+}
+
+static uint8_t is_slot_in_supported_range(uint8_t slot) {
+    if (slot >= SLOT_COUNT) {
+        udi_cdc_puts("\r\nSpecified slot outside of supported range [0-");
+        udi_cdc_putc('0' + (SLOT_COUNT-1));
+        udi_cdc_puts("]\r\n\r\n>");
+        return 0x00;
+    }
+    return 0x01;
 }

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "xmodem.h"
+#include "eeprom_slots.h"
 #include "udi_cdc.h"            /* udi_cdc_is_rx_ready/getc/putc */
 #include "system_time.h" /* get_uptime() -- 1 Hz uptime counter */
 
@@ -36,7 +37,7 @@ typedef enum {
 } state_t;
 
 static state_t   state;
-//static FIL      *file;
+static uint16_t  write_offset;   /* how far into slot 1 we've written so far */
 static uint8_t   buf[XMODEM_MAX_BLOCK + 2]; /* data + 2 CRC bytes */
 static uint8_t   pending_header;
 static uint16_t  data_len;
@@ -81,18 +82,29 @@ static void nak_and_retry(void)
 static void finish_block(void)
 {
     if ((uint8_t)(blk_num + blk_inv) != 0xFF) { nak_and_retry(); return; }
-
     uint16_t rx_crc = ((uint16_t)buf[data_len] << 8) | buf[data_len + 1];
     if (crc16_ccitt(buf, data_len) != rx_crc) { nak_and_retry(); return; }
-
+ 
     if (blk_num == expected_blk) {
-        //UINT bw;
-        //if (f_write(file, buf, data_len, &bw) != FR_OK || bw != data_len) {
-        //    udi_cdc_putc(CAN);
-        //    udi_cdc_putc(CAN);
-        //    status = XMODEM_DONE_ERROR;
-        //    return;
-        //}
+        eeprom_status_t est = eeprom_slot_write(1, write_offset, buf, data_len);
+        if (est == EEPROM_ERR_RANGE) {
+            /* Slot 1 is full -- incoming file is bigger than SLOT_SIZE.
+             * Abort cleanly rather than silently truncating or
+             * spilling into whatever comes after slot 1. */
+            udi_cdc_putc(CAN);
+            udi_cdc_putc(CAN);
+            status = XMODEM_DONE_ERROR;
+            return;
+        }
+        if (est != EEPROM_OK) {
+            /* bus error / write-cycle timeout -- fatal, same as the
+             * original file-write-failure path did */
+            udi_cdc_putc(CAN);
+            udi_cdc_putc(CAN);
+            status = XMODEM_DONE_ERROR;
+            return;
+        }
+        write_offset += data_len;
         expected_blk++;
         udi_cdc_putc(ACK);
     } else if (blk_num == (uint8_t)(expected_blk - 1)) {
@@ -103,7 +115,7 @@ static void finish_block(void)
         status = XMODEM_DONE_ERROR;
         return;
     }
-
+ 
     block_retries = 0;
     state = ST_HEADER;
     state_enter_s = get_uptime();
@@ -111,17 +123,13 @@ static void finish_block(void)
 
 void xmodem_start(void)
 {
-    //file = fp;
     expected_blk = 1;
     handshake_retries = 0;
     block_retries = 0;
     data_idx = 0;
+    write_offset = 0;
     status = XMODEM_BUSY;
     state = ST_START;
-    /* Backdate so the first xmodem_poll() call fires the resend-'C'
-     * branch right away -- the actual protocol byte only goes out on
-     * that next poll, i.e. one main-loop iteration after this call
-     * returns, well after this command's own text output. */
     state_enter_s = get_uptime() - START_RETRY_S;
     while (udi_cdc_is_rx_ready()) udi_cdc_getc(); /* flush stale input */
 }

@@ -19,7 +19,7 @@ void eeprom_hw_init(void)
     /* 25LC256 supports up to 10MHz (Vcc>=2.5V) / 20MHz (Vcc>=4.5V) per
      * datasheet -- 4MHz is a conservative starting point; raise it
      * once basic reads/writes are confirmed working. */
-    config_spi_master.mode_specific.master.baudrate = 4000000;
+    config_spi_master.mode_specific.master.baudrate = 10000000;
 
     spi_init(s_spi, EEPROM_SERCOM, &config_spi_master);
     spi_enable(s_spi);
