@@ -59,8 +59,8 @@
 //	(USB_CONFIG_ATTR_REMOTE_WAKEUP|USB_CONFIG_ATTR_BUS_POWERED)
 
 //! USB Device string definitions (Optional)
-#define  USB_DEVICE_MANUFACTURE_NAME      "ATMEL ASF"
-#define  USB_DEVICE_PRODUCT_NAME          "CDC Virtual Com"
+#define  USB_DEVICE_MANUFACTURE_NAME      "SQ9RZI"
+#define  USB_DEVICE_PRODUCT_NAME          "ZorkLock"
 // #define  USB_DEVICE_SERIAL_NAME           "12...EF"
 
 
