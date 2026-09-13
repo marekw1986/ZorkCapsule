@@ -724,7 +724,7 @@ static void monitor(void) {
     static uint8_t previous_lantern_on_state = 0;
     static uint8_t previous_location = 0;
     
-    set_score_indicator(SCORE);
+    set_score_indicator(map_u16(SCORE, 0, 350, 0, 255));
     
     if (previous_lantern_held_state != LANTERN_HELD) {
         if (LANTERN_HELD) {
@@ -739,9 +739,11 @@ static void monitor(void) {
     if (previous_lantern_on_state != LANTERN_STATE) {
         if (LANTERN_STATE) {
             printf("Lantern turned on\r\n");
+            set_lantern_indicator(255);
         }
         else {
             printf("Lantern turned off\r\n");
+            set_lantern_indicator(0);
         }
         previous_lantern_on_state = LANTERN_STATE;
     }
@@ -749,6 +751,7 @@ static void monitor(void) {
     if (previous_sword_held_state != SWORD_HELD) {
         if (SWORD_HELD) {
             printf("Sword taken, glow: %u\r\n", SWORD_GLOW);
+            set_sword_indicator(map_u8(SWORD_GLOW, 0, 2, 0, 255));
         }
         else {
             printf("Sword dropped\r\n");
@@ -757,16 +760,22 @@ static void monitor(void) {
     }
     
     if ((previous_sword_glow_state != SWORD_GLOW)) {
+        //uint8_t sword_pwm = map_u8(SWORD_GLOW, 0, 2, 0, 255);
+        //printf("Calculated sword PWM: %d\r\n", sword_pwm);
+        //set_sword_indicator(sword_pwm);
         switch(SWORD_GLOW) {
             case 0:
+            set_sword_indicator(0);
             printf("Sword stopped glowing\r\n");
             break;
             
             case 1:
+            set_sword_indicator(20);
             printf("Sword glows slightly\r\n");
             break;
             
             case 2:
+            set_sword_indicator(255);
             printf("Sword glows brightly\r\n");
             break;
             
@@ -778,6 +787,16 @@ static void monitor(void) {
     
     if (previous_location != PLAYER_LOC) {
         printf("Player moved to location id: %u\r\n", PLAYER_LOC);
+        if (!LANTERN_IN_ROOM && !LANTERN_HELD) {
+            // If we left lantern, turn off indicator
+            set_lantern_indicator(0);
+        }
+        
+        if (!SWORD_IN_ROOM && !SWORD_HELD) {
+            // If we left sword, turn off indicator
+            set_sword_indicator(0);
+        }
+        
         if ( (PLAYER_LOC == STONE_BARROW_ROOM) && (SCORE == 350) ) {
             // Victory!
             open_lock();

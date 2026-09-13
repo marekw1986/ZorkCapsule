@@ -20,7 +20,9 @@
 
 #define PLAYER_OBJ      4        /* confirmed independently via mojozork source comments ("ZORK1_PLAYER_OBJID 4") */
 #define SWORD_HELD      (SWORD_PARENT == PLAYER_OBJ)
+#define SWORD_IN_ROOM   (SWORD_PARENT == PLAYER_LOC)
 #define LANTERN_HELD    (LANTERN_PARENT == PLAYER_OBJ)
+#define LANTERN_IN_ROOM (LANTERN_PARENT == PLAYER_LOC)
 
 #define PLAYER_ADDR   0x0309
 #define PLAYER_LOC    dynamic_memory[PLAYER_ADDR + 4]

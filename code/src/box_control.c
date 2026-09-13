@@ -33,8 +33,12 @@ void initialize_pwm(void)
     tcc_enable(&tcc2_instance);
 }
 
+void set_lantern_indicator(uint8_t val) {
+    tcc_set_compare_value(&tcc0_instance, TCC_MATCH_CAPTURE_CHANNEL_2, val);
+}
+
 void set_sword_indicator(uint8_t val) {
-    tcc_set_compare_value(&tcc0_instance, TCC_MATCH_CAPTURE_CHANNEL_1, val);
+    tcc_set_compare_value(&tcc0_instance, TCC_MATCH_CAPTURE_CHANNEL_3, val);
 }
 
 void set_score_indicator(uint8_t val) {
@@ -56,4 +60,12 @@ uint8_t map_u8(uint8_t x, uint8_t in_min, uint8_t in_max, uint8_t out_min, uint8
 
     return (uint8_t)(((uint16_t)(x - in_min) * (out_max - out_min)) /
                      (in_max - in_min) + out_min);
+}
+
+uint16_t map_u16(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max)
+{
+    if (in_max == in_min)
+        return out_min;
+    return (uint16_t)(((uint32_t)(x - in_min) * (out_max - out_min)) /
+                      (in_max - in_min) + out_min);
 }
