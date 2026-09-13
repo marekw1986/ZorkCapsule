@@ -802,7 +802,7 @@ static void monitor(void) {
         if (SWORD_GLOW) {
             if (SWORD_IN_ROOM) {
                 // We entered room with glowing sword. Switch indicator on.
-                set_sword_indicator(map_u8(SWORD_GLOW, 0, 2, 0, 255));
+                set_sword_indicator((SWORD_GLOW == 1) ? 20 : 255);
             }
             else if (SWORD_PARENT == previous_location) {
                 // Sword is glowing, but we left it in different room. Switch indicator.
