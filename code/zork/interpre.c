@@ -736,6 +736,7 @@ static void monitor(void) {
         previous_lantern_held_state = LANTERN_HELD;
     }
     
+    // We can only turn on/off lantern which is held or in the same room
     if (previous_lantern_on_state != LANTERN_STATE) {
         if (LANTERN_STATE) {
             printf("Lantern turned on\r\n");
@@ -751,7 +752,6 @@ static void monitor(void) {
     if (previous_sword_held_state != SWORD_HELD) {
         if (SWORD_HELD) {
             printf("Sword taken, glow: %u\r\n", SWORD_GLOW);
-            set_sword_indicator(map_u8(SWORD_GLOW, 0, 2, 0, 255));
         }
         else {
             printf("Sword dropped\r\n");
@@ -787,14 +787,27 @@ static void monitor(void) {
     
     if (previous_location != PLAYER_LOC) {
         printf("Player moved to location id: %u\r\n", PLAYER_LOC);
-        if (!LANTERN_IN_ROOM && !LANTERN_HELD) {
-            // If we left lantern, turn off indicator
-            set_lantern_indicator(0);
+
+        if (LANTERN_STATE) {
+            if (LANTERN_IN_ROOM) {
+                // We entered room with powered on lantern. Switch indicator on.
+                set_lantern_indicator(255);
+            }
+            else if (LANTERN_PARENT == previous_location) {
+                // Lantern is powered on, but we left it in different room. Switch off indicator.
+                set_lantern_indicator(0);
+            }
         }
         
-        if (!SWORD_IN_ROOM && !SWORD_HELD) {
-            // If we left sword, turn off indicator
-            set_sword_indicator(0);
+        if (SWORD_GLOW) {
+            if (SWORD_IN_ROOM) {
+                // We entered room with glowing sword. Switch indicator on.
+                set_sword_indicator(map_u8(SWORD_GLOW, 0, 2, 0, 255));
+            }
+            else if (SWORD_PARENT == previous_location) {
+                // Sword is glowing, but we left it in different room. Switch indicator.
+                set_sword_indicator(0);
+            }
         }
         
         if ( (PLAYER_LOC == STONE_BARROW_ROOM) && (SCORE == 350) ) {
